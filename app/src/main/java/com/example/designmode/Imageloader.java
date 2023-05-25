@@ -13,27 +13,18 @@ import java.util.concurrent.Executors;
 
 public class Imageloader {
     //图片缓存
-    LruCache<String, Bitmap> mImageCache;
+    ImageCache  mImageCache = new ImageCache();
     //线程池数量
     ExecutorService mExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-    public Imageloader() {
-        initImageCache();
-    }
 
-    public void initImageCache() {
-        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-        final int cacheSize = maxMemory / 4;
-        mImageCache = new LruCache<String, Bitmap>(cacheSize) {
-            @Override
-            protected int sizeOf(String key, Bitmap value) {
-                return value.getRowBytes() * value.getHeight() / 1024;
-            }
-        };
-
-    }
 
     public void displayImage(final String url, final ImageView imageView) {
+        Bitmap bitmap = mImageCache.get(url);
+        if (bitmap != null){
+            imageView.setImageBitmap(bitmap);
+            return;
+        }
         imageView.setTag(url);
         mExecutorService.submit(new Runnable() {
             @Override
