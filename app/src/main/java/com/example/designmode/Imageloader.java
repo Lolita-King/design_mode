@@ -69,12 +69,4 @@ public class Imageloader {
         return bitmap;
     }
 
-    public void steUseDiskCache(boolean useDiskCache) {
-        isUseDiskCache = useDiskCache;
-    }
-
-    public void setUseDoubleCache(boolean useDiskCache) {
-        isUseDiskCache = useDiskCache;
-    }
-
 }

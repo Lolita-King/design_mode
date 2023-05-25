@@ -2,7 +2,9 @@ package com.example.designmode;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import com.example.designmode.util.CloseUtils;
 
+import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,11 +27,7 @@ public class DiskCache implements ImageCache{
             throw new RuntimeException(e);
         }finally  {
             if (fileOutputStream!=null){
-                try{
-                    fileOutputStream.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                CloseUtils.closeQuietly(fileOutputStream);
             }
         }
     }
