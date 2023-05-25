@@ -14,13 +14,31 @@ import java.util.concurrent.Executors;
 public class Imageloader {
     //图片缓存
     ImageCache  mImageCache = new ImageCache();
+
+    //sd卡缓存
+    DiskCache mDiskCache = new DiskCache();
+    //双缓存
+    DoubleCache mDoubleCache = new DoubleCache();
+    //使用双缓
+    boolean isUseDoubleCache = false;
+    //是否使用SD卡缓存
+    boolean isUseDiskCache = false;
+
     //线程池数量
     ExecutorService mExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
 
 
     public void displayImage(final String url, final ImageView imageView) {
-        Bitmap bitmap = mImageCache.get(url);
+        //判断使用哪种缓存
+        Bitmap bitmap = null;
+        if (isUseDoubleCache){
+            bitmap = mDoubleCache.get(url);
+        } else if(isUseDiskCache){
+            mDiskCache.get(url);
+        } else {
+            mImageCache.get(url);
+        }
         if (bitmap != null){
             imageView.setImageBitmap(bitmap);
             return;
@@ -52,6 +70,14 @@ public class Imageloader {
 
         }
         return bitmap;
+    }
+
+    public void steUseDiskCache(boolean useDiskCache){
+        isUseDiskCache = useDiskCache;
+    }
+
+    public void setUseDoubleCache(boolean useDiskCache){
+        isUseDiskCache = useDiskCache;
     }
 
 }
