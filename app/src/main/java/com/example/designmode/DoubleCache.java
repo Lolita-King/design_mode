@@ -2,8 +2,8 @@ package com.example.designmode;
 
 import android.graphics.Bitmap;
 
-public class DoubleCache {
-    ImageCache mMemoryCache = new ImageCache();
+public class DoubleCache implements ImageCache{
+    ImageCache mMemoryCache = new MemoryCache();
     DiskCache mDiskCache = new DiskCache();
     /**
      * 先从内存缓存中获取图片，如果没有，再从SD卡中获取

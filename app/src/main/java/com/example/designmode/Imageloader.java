@@ -2,7 +2,6 @@ package com.example.designmode;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.LruCache;
 import android.widget.ImageView;
 
 import java.net.HttpURLConnection;
@@ -13,36 +12,34 @@ import java.util.concurrent.Executors;
 
 public class Imageloader {
     //图片缓存
-    ImageCache  mImageCache = new ImageCache();
+    ImageCache mImageCache = new MemoryCache();
 
-    //sd卡缓存
-    DiskCache mDiskCache = new DiskCache();
-    //双缓存
-    DoubleCache mDoubleCache = new DoubleCache();
-    //使用双缓
-    boolean isUseDoubleCache = false;
-    //是否使用SD卡缓存
-    boolean isUseDiskCache = false;
 
     //线程池数量
     ExecutorService mExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-
+    /**
+     * 设置缓存类型，可自定义 imageCache 实现
+     * @param imageCache
+     */
+    public void setImageCache(ImageCache imageCache) {
+        mImageCache = imageCache;
+    }
 
     public void displayImage(final String url, final ImageView imageView) {
         //判断使用哪种缓存
-        Bitmap bitmap = null;
-        if (isUseDoubleCache){
-            bitmap = mDoubleCache.get(url);
-        } else if(isUseDiskCache){
-            mDiskCache.get(url);
-        } else {
-            mImageCache.get(url);
-        }
-        if (bitmap != null){
+        Bitmap bitmap = mImageCache.get(url);
+
+        if (bitmap != null) {
             imageView.setImageBitmap(bitmap);
             return;
         }
+        //图片没有缓存，提交到线程池中下载图片
+        submitLoadRequest(url,imageView);
+
+    }
+
+    private void submitLoadRequest(final String url, final ImageView imageView){
         imageView.setTag(url);
         mExecutorService.submit(new Runnable() {
             @Override
@@ -72,11 +69,11 @@ public class Imageloader {
         return bitmap;
     }
 
-    public void steUseDiskCache(boolean useDiskCache){
+    public void steUseDiskCache(boolean useDiskCache) {
         isUseDiskCache = useDiskCache;
     }
 
-    public void setUseDoubleCache(boolean useDiskCache){
+    public void setUseDoubleCache(boolean useDiskCache) {
         isUseDiskCache = useDiskCache;
     }
 
